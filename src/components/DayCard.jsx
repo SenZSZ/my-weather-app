@@ -10,8 +10,8 @@ function pct(temp) {
   return ((clamped - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
 }
 
-export default function DayCard({ data, selectedDay, setSelectedDay }) {
-  if (!Array.isArray(data) || data.length === 0) {
+export default function DayCard({ data, isLoading, selectedDay, setSelectedDay }) {
+  if (isLoading) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
         <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-faint">
@@ -19,6 +19,19 @@ export default function DayCard({ data, selectedDay, setSelectedDay }) {
         </p>
         <p className="font-mono text-sm text-ink-soft">
           station_log.query() —<span className="animate-pulse">_</span>
+        </p>
+      </div>
+    );
+  }
+
+  if (!Array.isArray(data) || data.length === 0) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
+        <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-faint">
+          No records on file
+        </p>
+        <p className="font-mono text-sm text-ink-soft">
+          station_log.query() → 0 rows
         </p>
       </div>
     );
@@ -51,10 +64,10 @@ export default function DayCard({ data, selectedDay, setSelectedDay }) {
             key={day.date || index}
             type="button"
             onClick={() => setSelectedDay(day)}
-            className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors duration-150 ${
+            className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left outline-offset-2 transition-colors duration-150 focus-visible:outline focus-visible:outline-2 ${
               isSelected
-                ? "border-ink bg-ink text-white"
-                : "border-line bg-surface text-ink hover:border-teal/50 hover:bg-teal-soft/40"
+                ? "border-ink bg-ink text-white focus-visible:outline-amber"
+                : "border-line bg-surface text-ink hover:border-teal/50 hover:bg-teal-soft/40 focus-visible:outline-teal"
             }`}
           >
             <div

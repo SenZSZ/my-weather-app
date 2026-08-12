@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 function App() {
   const [state, setState] = useState("");
   const [forecast, setForecast] = useState(null); // Array shape initialization
+  const [isLoading, setIsLoading] = useState(false);
   const [warning, setWarning] = useState("");
   const [selectedDay, setSelectedDay] = useState(null);
 
@@ -18,6 +19,10 @@ function App() {
 
   useEffect(() => {
     if (state) {
+      // Clear the previous station's log immediately so a slow response
+      // can't leave a stale, mismatched day list on screen while it loads.
+      setForecast(null);
+      setIsLoading(true);
       fetch(
         `https://api.data.gov.my/weather/forecast?filter=${state}@location__location_name&sort=date`,
       )
@@ -32,7 +37,8 @@ function App() {
         .catch((error) => {
           console.error("Fetch failure error metric:", error);
           setWarning("Error fetching weather data. Please try again later.");
-        });
+        })
+        .finally(() => setIsLoading(false));
     }
   }, [state]);
 
@@ -66,6 +72,7 @@ function App() {
             <div className="overflow-y-auto rounded-lg border border-line bg-surface/60 p-3 md:h-[620px] md:max-h-[620px]">
               <DayCard
                 data={forecast}
+                isLoading={isLoading}
                 selectedDay={selectedDay}
                 setSelectedDay={setSelectedDay}
               />

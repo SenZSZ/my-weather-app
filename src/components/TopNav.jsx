@@ -49,7 +49,7 @@ function TopNav({ setState }) {
                 defaultValue=""
                 name="state"
                 onChange={(e) => setState(e.target.value)}
-                className="w-56 cursor-pointer appearance-none rounded-md border border-white/15 bg-white/5 py-2 pl-3 pr-9 text-sm font-medium text-white outline-none transition-colors duration-150 hover:border-white/30 focus:border-teal focus:bg-white/10"
+                className="w-56 cursor-pointer appearance-none rounded-md border border-white/15 bg-white/5 py-2 pl-3 pr-9 text-sm font-medium text-white outline-offset-2 transition-colors duration-150 hover:border-white/30 focus:border-teal focus:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-amber"
               >
                 <option className="text-ink" value="" disabled hidden>
                   Select a state
