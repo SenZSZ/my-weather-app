@@ -1,6 +1,7 @@
 import TopNav from "./components/TopNav";
 import DayCard from "./components/DayCard";
 import DayDetailsComponent from "./components/DayDetailsComponent";
+import IsobarDivider from "./components/IsobarDivider";
 import { useState, useEffect } from "react";
 
 function App() {
@@ -36,28 +37,33 @@ function App() {
   }, [state]);
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(125,211,252,0.18),_transparent_35%),linear-gradient(135deg,_#f8fbff_0%,_#eef6ff_45%,_#f8fafc_100%)] text-slate-800 flex flex-col font-sans">
+    <div className="flex min-h-screen flex-col bg-paper font-sans text-ink">
       <TopNav setState={setState} />
 
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-start p-4 md:p-8">
         {warning && (
-          <div className="mb-4 rounded-2xl border border-rose-200 bg-rose-50/90 px-4 py-3 text-sm font-semibold text-rose-700 shadow-sm">
-            <span className="mr-2">⚠️</span>
-            {warning}
+          <div className="mb-4 flex items-center gap-2 rounded-lg border border-red/30 bg-red-soft px-4 py-3 text-sm font-medium text-red">
+            <span className="font-mono text-xs uppercase tracking-widest">
+              Alert
+            </span>
+            <span className="text-ink">{warning}</span>
           </div>
         )}
 
         {!state ? (
-          <div className="flex min-h-[440px] flex-1 flex-col items-center justify-center rounded-[28px] border border-slate-200/80 bg-white/80 p-8 text-center shadow-[0_20px_70px_-30px_rgba(15,23,42,0.35)] backdrop-blur">
-            <span className="mb-3 text-5xl">🗺️</span>
-            <p className="max-w-xl text-lg font-semibold tracking-wide text-slate-600">
-              No State Selected. Please choose a Malaysian region from the top
-              menu to explore the forecast.
+          <div className="flex min-h-[440px] flex-1 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-line bg-surface/60 p-8 text-center">
+            <p className="font-mono text-xs uppercase tracking-[0.3em] text-ink-faint">
+              Station idle
             </p>
+            <p className="max-w-md text-lg font-medium text-ink-soft">
+              Select a state from the station menu above to load its
+              forecast log.
+            </p>
+            <IsobarDivider className="mt-2 h-3 w-40 text-line" />
           </div>
         ) : (
           <div className="grid w-full grid-cols-1 gap-6 items-stretch md:grid-cols-[1.05fr_1.95fr]">
-            <div className="overflow-y-auto rounded-[24px] border border-slate-200/70 bg-white/80 p-3 shadow-[0_20px_70px_-35px_rgba(2,132,199,0.45)] backdrop-blur md:h-[620px] md:max-h-[620px]">
+            <div className="overflow-y-auto rounded-lg border border-line bg-surface/60 p-3 md:h-[620px] md:max-h-[620px]">
               <DayCard
                 data={forecast}
                 selectedDay={selectedDay}

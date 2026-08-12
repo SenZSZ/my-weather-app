@@ -1,16 +1,26 @@
+import IsobarDivider from "./IsobarDivider";
+import { conditionIcon } from "../lib/weatherIcons";
+
+const PERIODS = [
+  { key: "morning_forecast", label: "Pagi", en: "Morning", window: "06–12", period: "morning" },
+  { key: "afternoon_forecast", label: "Petang", en: "Afternoon", window: "12–18", period: "afternoon" },
+  { key: "night_forecast", label: "Malam", en: "Night", window: "18–06", period: "night" },
+];
+
 export default function DayDetailsComponent({ selectedDay }) {
   if (!selectedDay) {
     return (
-      <div className="flex h-full flex-col items-center justify-center rounded-[24px] border border-dashed border-slate-200 bg-white/80 p-12 text-center shadow-[0_20px_70px_-35px_rgba(15,23,42,0.25)] backdrop-blur">
-        <p className="max-w-sm text-base font-medium text-slate-500">
-          Select a day tracking item from the sidebar to inspect granular
-          metrics.
+      <div className="flex h-full flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-line bg-surface/60 p-12 text-center">
+        <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-faint">
+          No record selected
+        </p>
+        <p className="max-w-sm text-sm font-medium text-ink-soft">
+          Choose a day from the log on the left to inspect its full reading.
         </p>
       </div>
     );
   }
 
-  // Destruction tracking object payload map mapping keys safely
   const {
     location,
     date,
@@ -23,6 +33,8 @@ export default function DayDetailsComponent({ selectedDay }) {
     max_temp,
   } = selectedDay;
 
+  const forecastByKey = { morning_forecast, afternoon_forecast, night_forecast };
+
   const formattedDate = date
     ? new Date(date).toLocaleDateString("en-MY", {
         weekday: "long",
@@ -30,86 +42,78 @@ export default function DayDetailsComponent({ selectedDay }) {
         month: "long",
         year: "numeric",
       })
-    : "Unknown Timeline Date";
+    : "Unknown date";
+
+  const HeroIcon = conditionIcon(summary_forecast, "afternoon");
 
   return (
-    <div className="flex h-full w-full flex-col justify-between rounded-[24px] border border-slate-200/70 bg-white/90 p-6 shadow-[0_20px_70px_-35px_rgba(2,132,199,0.4)] backdrop-blur">
-      <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+    <div className="flex h-full w-full flex-col rounded-lg border border-line bg-surface p-6 sm:p-8">
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-extrabold tracking-tight text-slate-800">
-            {location?.location_name || "Unknown Location"}
+          <h2 className="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+            {location?.location_name || "Unknown location"}
           </h2>
-          <p className="mt-1 text-sm font-semibold text-slate-400">
-            {formattedDate}
-          </p>
+          <p className="mt-1 font-mono text-xs text-ink-soft">{formattedDate}</p>
         </div>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-[10px] font-mono font-bold uppercase tracking-[0.25em] text-slate-500">
-          ID: {location?.location_id || "N/A"}
+        <span className="shrink-0 rounded-md border border-line px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">
+          {location?.location_id || "N/A"}
         </span>
       </div>
 
-      <div className="my-4 grid flex-1 grid-cols-1 items-center gap-4 sm:grid-cols-2">
-        <div className="flex h-full flex-col justify-center rounded-2xl border border-orange-100 bg-gradient-to-br from-amber-50 to-orange-50 p-4">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.25em] text-orange-600">
-            Temperature Readings
+      <IsobarDivider className="my-5 text-line" />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[auto_1fr] sm:items-center">
+        <div className="flex items-baseline gap-1 font-mono">
+          <span className="text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
+            {max_temp}°
           </span>
-          <div className="mt-2 flex items-baseline gap-3">
-            <span className="text-4xl font-black tracking-tighter text-slate-800">
-              {max_temp}°C
-            </span>
-            <span className="text-xs font-bold text-slate-400">
-              Min limit: {min_temp}°C
-            </span>
-          </div>
+          <span className="text-xl text-ink-faint">/{min_temp}°</span>
         </div>
 
-        <div className="flex h-full flex-col justify-center rounded-2xl border border-sky-100 bg-sky-50 p-4">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.25em] text-sky-700">
-            Overall Condition Summary
-          </span>
-          <p className="mt-2 text-base font-bold leading-snug text-slate-800">
-            {summary_forecast}
-          </p>
-          {summary_when && (
-            <p className="mt-1 text-xs font-semibold text-sky-600 opacity-90">
-              Expected around the {summary_when.toLowerCase()} window.
+        <div className="flex items-start gap-3 border-t border-line pt-4 sm:border-l sm:border-t-0 sm:pl-6 sm:pt-0">
+          <HeroIcon className="mt-0.5 h-7 w-7 shrink-0 text-teal" />
+          <div>
+            <p className="text-base font-semibold leading-snug text-ink">
+              {summary_forecast || "No summary available"}
             </p>
-          )}
+            {summary_when && (
+              <p className="mt-0.5 font-mono text-xs uppercase tracking-wide text-ink-faint">
+                Expected {summary_when.toLowerCase()}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="border-t border-slate-100 pt-4">
-        <h3 className="mb-3 text-[11px] font-extrabold uppercase tracking-[0.35em] text-slate-400">
-          Granular Timeline Windows
+      <div className="mt-8 flex-1">
+        <h3 className="mb-3 font-mono text-[10px] uppercase tracking-[0.3em] text-ink-faint">
+          Forecast Windows
         </h3>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="flex flex-col gap-1 rounded-2xl border border-slate-100 bg-slate-50/80 p-3.5">
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
-              ☀️ Morning
-            </span>
-            <p className="mt-0.5 text-xs font-bold leading-relaxed text-slate-700">
-              {morning_forecast || "No forecast records"}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-1 rounded-2xl border border-slate-100 bg-slate-50/80 p-3.5">
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
-              🌤️ Afternoon
-            </span>
-            <p className="mt-0.5 text-xs font-bold leading-relaxed text-slate-700">
-              {afternoon_forecast || "No forecast records"}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-1 rounded-2xl border border-slate-100 bg-slate-50/80 p-3.5">
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
-              🌙 Night
-            </span>
-            <p className="mt-0.5 text-xs font-bold leading-relaxed text-slate-700">
-              {night_forecast || "No forecast records"}
-            </p>
-          </div>
+          {PERIODS.map(({ key, label, en, window, period }) => {
+            const text = forecastByKey[key];
+            const PeriodIcon = conditionIcon(text, period);
+            return (
+              <div
+                key={key}
+                className="flex flex-col gap-2 rounded-lg border border-line bg-paper/60 p-4"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink-faint">
+                    {label} · {en}
+                  </span>
+                  <PeriodIcon className="h-4 w-4 text-teal" />
+                </div>
+                <span className="font-mono text-[10px] text-ink-faint">
+                  {window}
+                </span>
+                <p className="text-sm font-medium leading-relaxed text-ink">
+                  {text || "No record"}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -1,66 +1,115 @@
+import { conditionIcon } from "../lib/weatherIcons";
+
+// Typical Malaysian dry-to-hot range used only to place the min/max bar —
+// not a hard clamp, just gives the reader a sense of scale at a glance.
+const SCALE_MIN = 20;
+const SCALE_MAX = 36;
+
+function pct(temp) {
+  const clamped = Math.min(SCALE_MAX, Math.max(SCALE_MIN, temp));
+  return ((clamped - SCALE_MIN) / (SCALE_MAX - SCALE_MIN)) * 100;
+}
+
 export default function DayCard({ data, selectedDay, setSelectedDay }) {
-  // Safe-guard layout container execution context
   if (!Array.isArray(data) || data.length === 0) {
     return (
-      <p className="p-4 text-center text-sm font-medium text-slate-400">
-        Loading weather records list...
-      </p>
+      <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center">
+        <p className="font-mono text-xs uppercase tracking-[0.25em] text-ink-faint">
+          Fetching records
+        </p>
+        <p className="font-mono text-sm text-ink-soft">
+          station_log.query() —<span className="animate-pulse">_</span>
+        </p>
+      </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-2.5">
-      {data.map((day, index) => {
-        // Safe data calculation formatting string values
-        const displayDate = day.date
-          ? new Date(day.date).toLocaleDateString("en-MY", {
-              weekday: "short",
-              day: "numeric",
-              month: "short",
-            })
-          : `Day ${index + 1}`;
+    <div className="flex flex-col gap-2">
+      <p className="px-1 pb-1 font-mono text-[10px] uppercase tracking-[0.25em] text-ink-faint">
+        {data.length}-Day Log
+      </p>
 
-        // Check active node selection boundaries mapping tracking
+      {data.map((day, index) => {
+        const weekday = day.date
+          ? new Date(day.date).toLocaleDateString("en-MY", { weekday: "short" })
+          : "—";
+        const dayNum = day.date ? new Date(day.date).getDate() : index + 1;
+        const month = day.date
+          ? new Date(day.date).toLocaleDateString("en-MY", { month: "short" })
+          : "";
+
         const isSelected = selectedDay && selectedDay.date === day.date;
+        const Icon = conditionIcon(day.summary_forecast, "afternoon");
+
+        const min = Number(day.min_temp);
+        const max = Number(day.max_temp);
+        const hasRange = !Number.isNaN(min) && !Number.isNaN(max);
 
         return (
-          <div
+          <button
             key={day.date || index}
+            type="button"
             onClick={() => setSelectedDay(day)}
-            className={`flex cursor-pointer items-center justify-between rounded-2xl border p-4 transition-all duration-200 ${
+            className={`flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors duration-150 ${
               isSelected
-                ? "border-sky-500 bg-sky-600 text-white shadow-[0_16px_35px_-20px_rgba(2,132,199,0.75)]"
-                : "border-slate-200 bg-white text-slate-700 shadow-sm hover:-translate-y-0.5 hover:border-sky-200 hover:bg-sky-50"
+                ? "border-ink bg-ink text-white"
+                : "border-line bg-surface text-ink hover:border-teal/50 hover:bg-teal-soft/40"
             }`}
           >
-            <div className="flex min-w-0 flex-1 items-center gap-3">
-              <div
-                className={`h-2.5 w-2.5 rounded-full ${
-                  isSelected ? "bg-white/90" : "bg-sky-400"
-                }`}
-              />
-              <div className="flex min-w-0 flex-col">
-                <span
-                  className={`text-sm font-bold ${isSelected ? "text-white" : "text-slate-800"}`}
-                >
-                  {displayDate}
-                </span>
-                <span
-                  className={`mt-1 truncate text-xs ${isSelected ? "text-sky-100 opacity-90" : "text-slate-500"}`}
-                >
-                  {day.summary_forecast || "Click to see details"}
-                </span>
-              </div>
-            </div>
-
-            <span
-              className={`ml-2 text-base font-bold transition-transform duration-200 ${
-                isSelected ? "translate-x-0.5 text-white" : "text-slate-400"
+            <div
+              className={`flex w-12 shrink-0 flex-col items-center border-r pr-3 font-mono ${
+                isSelected ? "border-white/15" : "border-line"
               }`}
             >
-              →
-            </span>
-          </div>
+              <span
+                className={`text-[9px] uppercase tracking-wider ${isSelected ? "text-mist" : "text-ink-faint"}`}
+              >
+                {weekday}
+              </span>
+              <span className="text-lg font-semibold leading-tight">{dayNum}</span>
+              <span
+                className={`text-[9px] uppercase tracking-wider ${isSelected ? "text-mist" : "text-ink-faint"}`}
+              >
+                {month}
+              </span>
+            </div>
+
+            <Icon
+              className={`h-5 w-5 shrink-0 ${isSelected ? "text-white" : "text-teal"}`}
+            />
+
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold">
+                {day.summary_forecast || "No summary available"}
+              </p>
+              {hasRange && (
+                <div className="mt-2 flex items-center gap-2">
+                  <span
+                    className={`font-mono text-[11px] ${isSelected ? "text-mist" : "text-ink-faint"}`}
+                  >
+                    {min}°
+                  </span>
+                  <div
+                    className={`relative h-1 flex-1 overflow-hidden rounded-full ${
+                      isSelected ? "bg-white/15" : "bg-line"
+                    }`}
+                  >
+                    <div
+                      className={`absolute h-full rounded-full ${isSelected ? "bg-amber" : "bg-amber"}`}
+                      style={{
+                        left: `${pct(min)}%`,
+                        width: `${Math.max(pct(max) - pct(min), 4)}%`,
+                      }}
+                    />
+                  </div>
+                  <span className="font-mono text-[11px] font-semibold">
+                    {max}°
+                  </span>
+                </div>
+              )}
+            </div>
+          </button>
         );
       })}
     </div>

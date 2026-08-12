@@ -1,55 +1,81 @@
+import IsobarDivider from "./IsobarDivider";
+
+const STATES = [
+  "Johor",
+  "Kedah",
+  "Kelantan",
+  "Melaka",
+  "Negeri Sembilan",
+  "Pahang",
+  "Pulau Pinang",
+  "Perak",
+  "Perlis",
+  "Selangor",
+  "Terengganu",
+  "Sabah",
+  "Sarawak",
+  "W.P. Kuala Lumpur",
+  "W.P. Labuan",
+  "W.P. Putrajaya",
+];
+
+const today = new Date().toLocaleDateString("en-MY", {
+  weekday: "short",
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+});
+
 function TopNav({ setState }) {
   return (
-    <div className="border-b border-sky-200/60 bg-gradient-to-r from-sky-600 via-sky-500 to-cyan-500 px-4 py-4 shadow-[0_10px_35px_-20px_rgba(3,105,161,0.8)] sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 text-2xl shadow-sm backdrop-blur">
-            🌤️
-          </div>
-          <div>
-            <h1 className="text-xl font-black tracking-tight text-white sm:text-2xl">
-              Weather<span className="ml-1 font-light text-sky-100">App</span>
-            </h1>
-            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-sky-100/90">
-              Malaysian forecasts
-            </p>
-          </div>
+    <header className="bg-ink text-paper">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+        <div className="flex items-baseline gap-3">
+          <h1 className="font-display text-2xl font-bold tracking-tight text-white">
+            CUACA<span className="text-teal">·</span>MY
+          </h1>
+          <p className="hidden font-mono text-[11px] uppercase tracking-[0.2em] text-mist sm:block">
+            National Forecast Network
+          </p>
         </div>
 
-        <div className="relative w-full sm:w-72">
-          <select
-            defaultValue=""
-            name="state"
-            onChange={(e) => setState(e.target.value)}
-            className="w-full cursor-pointer appearance-none rounded-2xl border border-sky-200/80 bg-white/95 px-4 py-3 pr-11 text-sm font-semibold text-slate-700 shadow-inner outline-none transition-all duration-200 hover:bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-200"
-          >
-            <option value="" disabled hidden>
-              Choose a state...
-            </option>
-            <option value="Johor">Johor</option>
-            <option value="Kedah">Kedah</option>
-            <option value="Kelantan">Kelantan</option>
-            <option value="Melaka">Melaka</option>
-            <option value="Negeri Sembilan">Negeri Sembilan</option>
-            <option value="Pahang">Pahang</option>
-            <option value="Pulau Pinang">Pulau Pinang</option>
-            <option value="Perak">Perak</option>
-            <option value="Perlis">Perlis</option>
-            <option value="Selangor">Selangor</option>
-            <option value="Terengganu">Terengganu</option>
-            <option value="Sabah">Sabah</option>
-            <option value="Sarawak">Sarawak</option>
-            <option value="W.P. Kuala Lumpur">W.P. Kuala Lumpur</option>
-            <option value="W.P. Labuan">W.P. Labuan</option>
-            <option value="W.P. Putrajaya">W.P. Putrajaya</option>
-          </select>
+        <div className="flex flex-wrap items-end gap-x-6 gap-y-3">
+          <label className="flex flex-col gap-1">
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-mist">
+              Station
+            </span>
+            <div className="relative">
+              <select
+                defaultValue=""
+                name="state"
+                onChange={(e) => setState(e.target.value)}
+                className="w-56 cursor-pointer appearance-none rounded-md border border-white/15 bg-white/5 py-2 pl-3 pr-9 text-sm font-medium text-white outline-none transition-colors duration-150 hover:border-white/30 focus:border-teal focus:bg-white/10"
+              >
+                <option className="text-ink" value="" disabled hidden>
+                  Select a state
+                </option>
+                {STATES.map((name) => (
+                  <option className="text-ink" key={name} value={name}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+              <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-mist">
+                ▾
+              </span>
+            </div>
+          </label>
 
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-slate-500">
-            ▼
+          <div className="hidden flex-col gap-1 border-l border-white/10 pl-6 md:flex">
+            <span className="font-mono text-[10px] uppercase tracking-[0.25em] text-mist">
+              Reading Taken
+            </span>
+            <span className="font-mono text-sm text-white">{today}</span>
           </div>
         </div>
       </div>
-    </div>
+      <IsobarDivider className="text-teal/70" />
+    </header>
   );
 }
 

@@ -1,4 +1,4 @@
-# Simple Weather APP
+# CUACA·MY
 
 Backend API: Malaysia Government Public API
 
